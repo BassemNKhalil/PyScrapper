@@ -1,7 +1,3 @@
-#add support for pre-release games
-##record only single price, the lower price (regardless new or preowned)
-##test adding a new item to db with 0 price works without flushing all data
-
 from pymongo import MongoClient
 from lxml import html
 import requests
@@ -10,60 +6,66 @@ from datetime import datetime
 client = MongoClient()
 db = client.test
 
-xpath = '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div/div/div[1]/div[2]/text()'
+xpathNew		= '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[1]/div[2]/text()'
+xpathUsed		= '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div[1]/div[2]/text()'
 xpathPreRelease = '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div[2]/text()'
 
-dbGames = db.games4
-dbGamesHistory = db.gamesHistory4
+dbGames = db.games5
+dbGamesHistory = db.gamesHistory5
 
 games = dbGames.find()
 for game in games:
-	gameTitle = game["GameTitle"]
-	gameURL = game["EBGamesURL"]
-	gamePrice = game["Price"];
-	page = requests.get(gameURL)
-	tree = html.fromstring(page.content)
-	price = tree.xpath(xpath)	# ['$28.00', '$19.00'] OR ['$12.00'] OR [] (in case of PreRelease checked by xpath not xpathPreRelease
+	dbTitle		= game["GameTitle"]
+	dbURL		= game["EBGamesURL"]
 
-	if price == []:
-		#price was empty, use PreRelease xpath
-		price = tree.xpath(xpathPreRelease)
-	
-	if len(price) > 1:
-		lowest_price = price[0] if price[0] < price[1] else price[1]
-	else:
-		lowest_price = price[0]	
-	
-	if lowest_price != gamePrice:
-		item = dbGamesHistory.insert(
-			{
-				"GameTitle": gameTitle,
-				"EBGamesURL": gameURL,
-				"Price": gamePrice,
-				"Date": datetime.now().strftime(datetime.now().strftime('%Y%m%d'))
-			}
-		)
+	page 		= requests.get(dbURL)
+	tree 		= html.fromstring(page.content)
+	prePrice	= tree.xpath(xpathPreRelease)
 
-		#set price in db
+	if prePrice == []:
+		#game is released, look for new\used prices
+		if "NewPrice" in game:
+			dbNewPrice	= game["NewPrice"]
+		else:
+			dbNewPrice = 0
 
-		result = dbGames.update_one(
-			{"GameTitle": gameTitle},{
-				"$set": {
-					"Price": lowest_price
-				}
-			}
-		)			
+		if "UsedPrice" in game:
+			dbUsedPrice	= game["UsedPrice"]
+		else:
+			dbUsedPrice = 0
 		
-		#display game
-		print('Title:\t\t',game["GameTitle"])
-		print('URL:\t\t',game["EBGamesURL"])
-		print('NewPrice:\t',price)
-		print("")
+		newPrice = tree.xpath(xpathNew)
+		usedPrice = tree.xpath(xpathUsed)
+		
+		if dbNewPrice == 0 or dbUsedPrice == 0 or newPrice < dbNewPrice or usedPrice < dbUsedPrice:
+			#dbGamesHistory.insert(dbGames.find({"GameURL":dbURL}))
+			dbGames.update_one(
+				{"GameTitle": dbTitle},
+				{
+					"$set": {
+						"NewPrice"	: newPrice,
+						"UsedPrice"	: usedPrice,
+					}
+				}
+			)
+			print(game["GameTitle"], "changed")
+		
 	else:
-		print('[[NotChanged]]',game["GameTitle"])
-
-#write to file
-filename = datetime.now().strftime(datetime.now().strftime('v4%Y%m%d.%H%M.scrap'))
-gamesToFile = dbGames.find()
-for game in gamesToFile:
-	print(game["Price"],'\t',game["GameTitle"], file=open(filename, "a"))
+		#game is pre-release, priced as in prePrice
+		if "PrePrice" in game:
+			dbPrePrice	= game["PrePrice"]
+		else:
+			dbPrePrice	= 0
+			#prePrice
+		
+		if dbPrePrice == 0 or prePrice < dbPrePrice:
+			#dbGamesHistory.insert(dbGames.find({"GameURL":dbURL}))
+			dbGames.update_one(
+				{"GameTitle": dbTitle},
+				{
+					"$set": {
+						"PreReleasePrice"	: prePrice,
+					}
+				}
+			)
+			print(game["GameTitle"], "changed")
