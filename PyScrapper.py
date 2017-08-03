@@ -1,36 +1,69 @@
+#add support for pre-release games
+##record only single price, the lower price (regardless new or preowned)
+##test adding a new item to db with 0 price works without flushing all data
+
+from pymongo import MongoClient
 from lxml import html
 import requests
+from datetime import datetime
 
-games = {
-    'WOLF NEW ORDER         :::https://ebgames.com.au/xbox-one-165287-wolfenstein-the-new-order-preowned-xbox-one',
-    'WOLF OLD BLOOD         :::https://ebgames.com.au/xbox-one-208413-wolfenstein-the-old-blood-preowned-xbox-one',
-    'FALLOUT 4              :::https://ebgames.com.au/xbox-one-202582-fallout-4-preowned-xbox-one',
-    'DEUS EX                :::https://ebgames.com.au/xbox-one-208246-deus-ex-mankind-divided-preowned-xbox-one',
-    'DESTINY                :::https://ebgames.com.au/xbox-one-165247-destiny-preowned-xbox-one',
-    'DOOM                   :::https://www.ebgames.com.au/xbox-one-201660-DOOM-preowned-Xbox-One',
-    'BATMAN ARKHAM KNIGHT   :::https://ebgames.com.au/xbox-one-200007-Batman-Arkham-Knight-preowned-Xbox-One',
-    'RECORE                 :::https://ebgames.com.au/xbox-one-206798-ReCore-preowned-Xbox-One',
-    'HALO 5: GUARDIANS      :::https://ebgames.com.au/xbox-one-165256-Halo-5-Guardians-preowned-Xbox-One',
-    'METAL GEAR SOLID V GZ  :::https://ebgames.com.au/xbox-one-165265-Metal-Gear-Solid-V-Ground-Zeroes-preowned-Xbox-One',
-    'Dishonored 2 LE        :::https://ebgames.com.au/xbox-one-202587-Dishonored-2---Limited-Edition-Xbox-One',
-    'MORTAL COMBAT Xbox     :::https://ebgames.com.au/xbox-one-202483-Mortal-Kombat-X-Xbox-One',
-    'Metal Gear Solid V TPP :::https://ebgames.com.au/xbox-one-165266-Metal-Gear-Solid-V-The-Phantom-Pain-preowned-Xbox-One',
-    'The Witcher 3 Wild Hunt:::https://ebgames.com.au/xbox-one-165282-The-Witcher-3-Wild-Hunt-preowned-Xbox-One',
-    'TITANFALL 2            :::https://ebgames.com.au/xbox-one-216077-Titanfall-2-preowned-Xbox-One',
-    'FOR HONOR              :::https://ebgames.com.au/xbox-one-206806-For-Honor-preowned-Xbox-One',
-    'RISE OF THE TOMB RAIDER:::https://ebgames.com.au/xbox-one-202510-Rise-of-the-Tomb-Raider-preowned-Xbox-One',
-    'BIOSHOCK COLLECTION    :::https://ebgames.com.au/xbox-one-221607-Bioshock-The-Collection-preowned-Xbox-One',
-    'GEARS OF WAR 4         :::https://ebgames.com.au/xbox-one-206794-Gears-of-War-4-preowned-Xbox-One',
-    'FORZA HORIZON 3        :::https://ebgames.com.au/xbox-one-220705-Forza-Horizon-3-preowned-Xbox-One',
-    'HITMAN COMPLETE SEASON :::https://ebgames.com.au/xbox-one-165257-HITMAN-The-Complete-First-Season-preowned-Xbox-One',
-    'INJUSTICE 2            :::https://ebgames.com.au/xbox-one-217280-Injustice-2-Xbox-One',
-}
+client = MongoClient()
+db = client.test
 
 xpath = '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div/div/div[1]/div[2]/text()'
-for gameData in games:
-    gameTitle = gameData.split(':::')[0]
-    gameURL = gameData.split(':::')[1]
-    page = requests.get(gameURL)
-    tree = html.fromstring(page.content)
-    price = tree.xpath(xpath)
-    print (gameTitle, ':', price)
+xpathPreRelease = '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div[2]/text()'
+
+dbGames = db.games4
+dbGamesHistory = db.gamesHistory4
+
+games = dbGames.find()
+for game in games:
+	gameTitle = game["GameTitle"]
+	gameURL = game["EBGamesURL"]
+	gamePrice = game["Price"];
+	page = requests.get(gameURL)
+	tree = html.fromstring(page.content)
+	price = tree.xpath(xpath)	# ['$28.00', '$19.00'] OR ['$12.00'] OR [] (in case of PreRelease checked by xpath not xpathPreRelease
+
+	if price == []:
+		#price was empty, use PreRelease xpath
+		price = tree.xpath(xpathPreRelease)
+	
+	if len(price) > 1:
+		lowest_price = price[0] if price[0] < price[1] else price[1]
+	else:
+		lowest_price = price[0]	
+	
+	if lowest_price != gamePrice:
+		item = dbGamesHistory.insert(
+			{
+				"GameTitle": gameTitle,
+				"EBGamesURL": gameURL,
+				"Price": gamePrice,
+				"Date": datetime.now().strftime(datetime.now().strftime('%Y%m%d'))
+			}
+		)
+
+		#set price in db
+
+		result = dbGames.update_one(
+			{"GameTitle": gameTitle},{
+				"$set": {
+					"Price": lowest_price
+				}
+			}
+		)			
+		
+		#display game
+		print('Title:\t\t',game["GameTitle"])
+		print('URL:\t\t',game["EBGamesURL"])
+		print('NewPrice:\t',price)
+		print("")
+	else:
+		print('[[NotChanged]]',game["GameTitle"])
+
+#write to file
+filename = datetime.now().strftime(datetime.now().strftime('v4%Y%m%d.%H%M.scrap'))
+gamesToFile = dbGames.find()
+for game in gamesToFile:
+	print(game["Price"],'\t',game["GameTitle"], file=open(filename, "a"))
