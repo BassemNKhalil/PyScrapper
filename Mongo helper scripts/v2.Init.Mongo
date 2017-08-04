@@ -1,7 +1,7 @@
-db.games5.remove({})
-db.gamesHistory5.remove({})
+db.games6.remove({})
+db.gamesHistory6.remove({})
 
-db.games5.insert(
+db.games6.insert(
    [
 		{ GameTitle: "WOLF NEW ORDER", EBGamesURL: "https://ebgames.com.au/xbox-one-165287-wolfenstein-the-new-order-preowned-xbox-one"},
 		{ GameTitle: "WOLF OLD BLOOD", EBGamesURL: "https://ebgames.com.au/xbox-one-208413-wolfenstein-the-old-blood-preowned-xbox-one"},
@@ -39,14 +39,13 @@ db.games5.insert(
 		{ GameTitle: "Tekken 7", EBGamesURL: "https://ebgames.com.au/xbox-one-202544-Tekken-7-preowned-Xbox-One"},
 	]
 )
-
-db.games5.count()
-db.gamesHistory5.count()
-
-db.games5.insert(
+db.games6.insert(
    [
 		{ GameTitle: "NBA 2k18", EBGamesURL: "https://ebgames.com.au/xbox-one-226161-NBA-2K18-Xbox-One"},
 		{ GameTitle: "Marvel vs Capcom Infinite", EBGamesURL: "https://ebgames.com.au/xbox-one-218468-Marvel-vs-Capcom-Infinite-Xbox-One"},
 		{ GameTitle: "Destiny 2", EBGamesURL: "https://ebgames.com.au/xbox-one-215615-Destiny-2-Xbox-One"},
 	]
 )
+
+db.games6.count()
+db.gamesHistory6.count()

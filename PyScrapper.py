@@ -10,20 +10,21 @@ xpathNew		= '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/di
 xpathUsed		= '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/div/div[1]/div[2]/text()'
 xpathPreRelease = '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div/div[2]/div[2]/text()'
 
-dbGames = db.games5
-dbGamesHistory = db.gamesHistory5
+dbGames = db.games6
+dbGamesHistory = db.gamesHistory6
 
 games = dbGames.find()
 for game in games:
+	insertIntoHistory = False
 	dbTitle		= game["GameTitle"]
 	dbURL		= game["EBGamesURL"]
 
 	page 		= requests.get(dbURL)
 	tree 		= html.fromstring(page.content)
 	prePrice	= tree.xpath(xpathPreRelease)
-
+	
 	if prePrice == []:
-		#game is released, look for new\used prices
+		#game is released
 		if "NewPrice" in game:
 			dbNewPrice	= game["NewPrice"]
 		else:
@@ -37,19 +38,33 @@ for game in games:
 		newPrice = tree.xpath(xpathNew)
 		usedPrice = tree.xpath(xpathUsed)
 		
-		if dbNewPrice == 0 or dbUsedPrice == 0 or newPrice < dbNewPrice or usedPrice < dbUsedPrice:
+		if (len(newPrice) > 0 and (dbNewPrice == 0 or float((newPrice[0][1:]) < dbNewPrice))):
+			insertIntoHistory = True
+			#if (dbNewPrice == 0)
+			dbGames.update_one(
+				{"GameTitle": dbTitle},
+				{
+					"$set": {
+						"NewPrice"	: float((newPrice[0][1:]))
+					}
+				}
+			)
+			print(game["GameTitle"], "changed-new")
+		
+		if (len(usedPrice) > 0 and (dbUsedPrice == 0 or float((usedPrice[0][1:]) < dbUsedPrice))):
+			insertIntoHistory = True
 			#dbGamesHistory.insert(dbGames.find({"GameURL":dbURL}))
 			dbGames.update_one(
 				{"GameTitle": dbTitle},
 				{
 					"$set": {
-						"NewPrice"	: newPrice,
-						"UsedPrice"	: usedPrice,
+						"UsedPrice"	: float((usedPrice[0][1:]))
 					}
 				}
 			)
-			print(game["GameTitle"], "changed")
-		
+			print(game["GameTitle"], "changed-used")
+
+			
 	else:
 		#game is pre-release, priced as in prePrice
 		if "PrePrice" in game:
@@ -58,14 +73,18 @@ for game in games:
 			dbPrePrice	= 0
 			#prePrice
 		
-		if dbPrePrice == 0 or prePrice < dbPrePrice:
+		if (len(prePrice) > 0 and (dbPrePrice == 0 or float((prePrice[0][1:]) < dbPrePrice))):
+			insertIntoHistory = True
 			#dbGamesHistory.insert(dbGames.find({"GameURL":dbURL}))
 			dbGames.update_one(
 				{"GameTitle": dbTitle},
 				{
 					"$set": {
-						"PreReleasePrice"	: prePrice,
+						"PreReleasePrice"	: float(prePrice[0][1:])
 					}
 				}
 			)
-			print(game["GameTitle"], "changed")
+			print(game["GameTitle"], "changed-pre")
+
+	if insertIntoHistory:
+		dbGamesHistory.insert(game)
