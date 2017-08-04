@@ -1,7 +1,7 @@
-db.games6.remove({})
-db.gamesHistory6.remove({})
+db.games.remove({})
+db.gamesHistory.remove({})
 
-db.games6.insert(
+db.games.insert(
    [
 		{ GameTitle: "WOLF NEW ORDER", EBGamesURL: "https://ebgames.com.au/xbox-one-165287-wolfenstein-the-new-order-preowned-xbox-one"},
 		{ GameTitle: "WOLF OLD BLOOD", EBGamesURL: "https://ebgames.com.au/xbox-one-208413-wolfenstein-the-old-blood-preowned-xbox-one"},
@@ -37,15 +37,53 @@ db.games6.insert(
 		{ GameTitle: "Assassins Creed Syndicate", EBGamesURL: "https://ebgames.com.au/xbox-one-206280-Assassins-Creed-Syndicate-preowned-Xbox-One"},
 		{ GameTitle: "Far Cry Primal", EBGamesURL: "https://ebgames.com.au/xbox-one-210384-Far-Cry-Primal-preowned-Xbox-One"},
 		{ GameTitle: "Tekken 7", EBGamesURL: "https://ebgames.com.au/xbox-one-202544-Tekken-7-preowned-Xbox-One"},
-	]
-)
-db.games6.insert(
-   [
 		{ GameTitle: "NBA 2k18", EBGamesURL: "https://ebgames.com.au/xbox-one-226161-NBA-2K18-Xbox-One"},
 		{ GameTitle: "Marvel vs Capcom Infinite", EBGamesURL: "https://ebgames.com.au/xbox-one-218468-Marvel-vs-Capcom-Infinite-Xbox-One"},
 		{ GameTitle: "Destiny 2", EBGamesURL: "https://ebgames.com.au/xbox-one-215615-Destiny-2-Xbox-One"},
 	]
 )
 
-db.games6.count()
-db.gamesHistory6.count()
+db.gamesHistory.insert(
+   [
+		{ GameTitle: "WOLF NEW ORDER", EBGamesURL: "https://ebgames.com.au/xbox-one-165287-wolfenstein-the-new-order-preowned-xbox-one"},
+		{ GameTitle: "WOLF OLD BLOOD", EBGamesURL: "https://ebgames.com.au/xbox-one-208413-wolfenstein-the-old-blood-preowned-xbox-one"},
+		{ GameTitle: "FALLOUT 4", EBGamesURL: "https://ebgames.com.au/xbox-one-202582-fallout-4-preowned-xbox-one"},
+		{ GameTitle: "DEUS EX", EBGamesURL: "https://ebgames.com.au/xbox-one-208246-deus-ex-mankind-divided-preowned-xbox-one"},
+		{ GameTitle: "DESTINY", EBGamesURL: "https://ebgames.com.au/xbox-one-165247-destiny-preowned-xbox-one"},
+		{ GameTitle: "DOOM", EBGamesURL: "https://www.ebgames.com.au/xbox-one-201660-DOOM-preowned-Xbox-One"},
+		{ GameTitle: "BATMAN ARKHAM KNIGHT", EBGamesURL: "https://ebgames.com.au/xbox-one-200007-Batman-Arkham-Knight-preowned-Xbox-One"},
+		{ GameTitle: "RECORE", EBGamesURL: "https://ebgames.com.au/xbox-one-206798-ReCore-preowned-Xbox-One"},
+		{ GameTitle: "HALO 5: GUARDIANS", EBGamesURL: "https://ebgames.com.au/xbox-one-165256-Halo-5-Guardians-preowned-Xbox-One"},
+		{ GameTitle: "METAL GEAR SOLID V GZ", EBGamesURL: "https://ebgames.com.au/xbox-one-165265-Metal-Gear-Solid-V-Ground-Zeroes-preowned-Xbox-One"},
+		{ GameTitle: "Dishonored 2 LE", EBGamesURL: "https://ebgames.com.au/xbox-one-202587-Dishonored-2---Limited-Edition-Xbox-One"},
+		{ GameTitle: "MORTAL COMBAT Xbox", EBGamesURL: "https://ebgames.com.au/xbox-one-202483-Mortal-Kombat-X-Xbox-One"},
+		{ GameTitle: "Metal Gear Solid V TPP", EBGamesURL: "https://ebgames.com.au/xbox-one-165266-Metal-Gear-Solid-V-The-Phantom-Pain-preowned-Xbox-One"},
+		{ GameTitle: "The Witcher 3 Wild Hunt", EBGamesURL: "https://ebgames.com.au/xbox-one-165282-The-Witcher-3-Wild-Hunt-preowned-Xbox-One"},
+		{ GameTitle: "TITANFALL 2", EBGamesURL: "https://ebgames.com.au/xbox-one-216077-Titanfall-2-preowned-Xbox-One"},
+		{ GameTitle: "FOR HONOR", EBGamesURL: "https://ebgames.com.au/xbox-one-206806-For-Honor-preowned-Xbox-One"},
+		{ GameTitle: "RISE OF THE TOMB RAIDER", EBGamesURL: "https://ebgames.com.au/xbox-one-202510-Rise-of-the-Tomb-Raider-preowned-Xbox-One"},
+		{ GameTitle: "BIOSHOCK COLLECTION", EBGamesURL: "https://ebgames.com.au/xbox-one-221607-Bioshock-The-Collection-preowned-Xbox-One"},
+		{ GameTitle: "GEARS OF WAR 4", EBGamesURL: "https://ebgames.com.au/xbox-one-206794-Gears-of-War-4-preowned-Xbox-One"},
+		{ GameTitle: "FORZA HORIZON 3", EBGamesURL: "https://ebgames.com.au/xbox-one-220705-Forza-Horizon-3-preowned-Xbox-One"},
+		{ GameTitle: "HITMAN COMPLETE SEASON", EBGamesURL: "https://ebgames.com.au/xbox-one-165257-HITMAN-The-Complete-First-Season-preowned-Xbox-One"},
+		{ GameTitle: "INJUSTICE 2", EBGamesURL: "https://ebgames.com.au/xbox-one-217280-Injustice-2-Xbox-One"},
+		{ GameTitle: "WWE 2k17", EBGamesURL: "https://ebgames.com.au/xbox-one-218872-WWE-2K17-preowned-Xbox-One"},
+		{ GameTitle: "Pro Evolution 17", EBGamesURL: "https://ebgames.com.au/xbox-one-220443-Pro-Evolution-Soccer-2017-preowned-Xbox-One"},
+		{ GameTitle: "XCOM 2", EBGamesURL: "https://ebgames.com.au/xbox-one-218863-XCOM-2-preowned-Xbox-One"},
+		{ GameTitle: "Mortal Combat XL", EBGamesURL: "https://ebgames.com.au/xbox-one-215122-Mortal-Kombat-XL-preowned-Xbox-One"},
+		{ GameTitle: "NBA 2k17", EBGamesURL: "https://ebgames.com.au/xbox-one-212816-NBA-2K17-preowned-Xbox-One"},
+		{ GameTitle: "Ghost Recon: Wildlands", EBGamesURL: "https://ebgames.com.au/xbox-one-208776-Tom-Clancys-Ghost-Recon-Wildlands-preowned-Xbox-One"},
+		{ GameTitle: "COD Infinite Warfare", EBGamesURL: "https://ebgames.com.au/xbox-one-217176-Call-of-Duty-Infinite-Warfare-preowned-Xbox-One"},
+		{ GameTitle: "Assassins Creed Ezio Collection", EBGamesURL: "https://ebgames.com.au/xbox-one-223561-Assassins-Creed-The-Ezio-Collection-preowned-Xbox-One"},
+		{ GameTitle: "Far Cry 4", EBGamesURL: "https://ebgames.com.au/xbox-one-201746-Far-Cry-4-preowned-Xbox-One"},
+		{ GameTitle: "Assassins Creed Syndicate", EBGamesURL: "https://ebgames.com.au/xbox-one-206280-Assassins-Creed-Syndicate-preowned-Xbox-One"},
+		{ GameTitle: "Far Cry Primal", EBGamesURL: "https://ebgames.com.au/xbox-one-210384-Far-Cry-Primal-preowned-Xbox-One"},
+		{ GameTitle: "Tekken 7", EBGamesURL: "https://ebgames.com.au/xbox-one-202544-Tekken-7-preowned-Xbox-One"},
+		{ GameTitle: "NBA 2k18", EBGamesURL: "https://ebgames.com.au/xbox-one-226161-NBA-2K18-Xbox-One"},
+		{ GameTitle: "Marvel vs Capcom Infinite", EBGamesURL: "https://ebgames.com.au/xbox-one-218468-Marvel-vs-Capcom-Infinite-Xbox-One"},
+		{ GameTitle: "Destiny 2", EBGamesURL: "https://ebgames.com.au/xbox-one-215615-Destiny-2-Xbox-One"},
+	]
+)
+
+db.games.count()
+db.gamesHistory.count()
