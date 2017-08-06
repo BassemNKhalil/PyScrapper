@@ -13,7 +13,7 @@ xpathPreRelease = '//*[@id="content"]/div/div[1]/div[2]/div[1]/div[2]/div[2]/div
 dbGames = db.games
 dbGamesHistory = db.gamesHistory
 
-diff = 0+1
+diff = 0
 print()
 print("diff:", diff)
 print()
@@ -98,6 +98,7 @@ for game in games:
 			else:
 				print(game["GameTitle"], "notchanged-pre")
 
+	latestGame = db.games.find_one({"GameTitle":game["GameTitle"]})
 	if insertIntoHistory:
 		result = dbGamesHistory.insert_one(
 			{
@@ -106,7 +107,7 @@ for game in games:
 			}
 		)
 
-		if "NewPrice" in game:
+		if "NewPrice" in latestGame:
 			dbGamesHistory.update_one(
 				{"_id": result.inserted_id},
 				{
@@ -115,7 +116,7 @@ for game in games:
 					}
 				}
 			)		
-		if "UsedPrice" in game:
+		if "UsedPrice" in latestGame:
 			dbGamesHistory.update_one(
 				{"_id": result.inserted_id},
 				{
@@ -124,7 +125,7 @@ for game in games:
 					}
 				}
 			)
-		if "PrePrice" in game:
+		if "PrePrice" in latestGame:
 			dbGamesHistory.update_one(
 				{"_id": result.inserted_id},
 				{
